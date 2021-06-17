@@ -10,6 +10,5 @@ group :test do
   gem 'fakeweb-matcher'
   gem 'mime-types'
   gem 'activesupport'
-  gem 'i18n', '~> 0.6.0'
   gem 'yajl-ruby', '~> 1.0', :platforms => [:mingw, :mswin, :ruby]
 end
