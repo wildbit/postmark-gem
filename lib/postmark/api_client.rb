@@ -352,6 +352,14 @@ module Postmark
       format_response(http_client.patch("message-streams/#{id}", data))
     end
 
+    def archive_message_stream(id)
+      format_response http_client.post("message-streams/#{id}/archive")
+    end
+
+    def unarchive_message_stream(id)
+      format_response http_client.post("message-streams/#{id}/unarchive")
+    end
+
     def dump_suppressions(stream_id, options = {})
       _, batch = load_batch("message-streams/#{stream_id}/suppressions/dump", 'Suppressions', options)
       batch

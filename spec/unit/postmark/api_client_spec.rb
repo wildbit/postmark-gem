@@ -606,7 +606,8 @@ describe Postmark::ApiClient do
   end
 
   describe "#server_info" do
-    let(:response) {{"Name" => "Testing",
+    let(:response) {
+      {"Name" => "Testing",
                      "Color" => "blue",
                      "InboundHash" => "c2425d77f74f8643e5f6237438086c81",
                      "SmtpApiActivated" => true}}
@@ -618,7 +619,8 @@ describe Postmark::ApiClient do
   end
 
   describe "#update_server_info" do
-    let(:response) {{"Name" => "Testing",
+    let(:response) {
+      {"Name" => "Testing",
                      "Color" => "blue",
                      "InboundHash" => "c2425d77f74f8643e5f6237438086c81",
                      "SmtpApiActivated" => false}}
@@ -1146,6 +1148,62 @@ describe Postmark::ApiClient do
         :created_at => '2020-04-01T03:33:33.333-03:00'
       )
     }
+  end
+
+  describe '#archive_message_stream' do
+    subject { api_client.archive_message_stream(stream_id) }
+
+    let(:stream_id) { 'my-stream'}
+    let(:server_id) { 123 }
+    let(:purge_date) { '2030-08-30T12:30:00.00-04:00' }
+    let(:api_endpoint) { "message-streams/#{stream_id}/archive" }
+    let(:api_response) {{ 'ID' => stream_id, 'ServerID' => server_id, 'ExpectedPurgeDate' => purge_date  }}
+
+    before do
+      allow(http_client).to receive(:post).with(api_endpoint) { api_response }
+    end
+
+    it 'calls the API endpoint' do
+      expect(http_client).to receive(:post).with(api_endpoint)
+      subject
+    end
+
+    it 'transforms the API response' do
+      expect(subject).to eq({ :id => stream_id, :server_id => server_id, :expected_purge_date => purge_date })
+    end
+  end
+
+  describe '#unarchive_message_stream' do
+    subject { api_client.unarchive_message_stream(stream_id) }
+
+    let(:stream_id) { 'my-stream'}
+    let(:server_id) { 123 }
+    let(:api_endpoint) { "message-streams/#{stream_id}/unarchive" }
+    let(:api_response) { 
+      { 'ID' => stream_id, 'ServerID' => server_id, 'Name' => 'My Stream',
+        'Description' => 'My test stream.', 'MessageStreamType' => 'Transactional',
+        'CreatedAt' => '2030-08-30T12:30:00.00-04:00', 'UpdatedAt' => '2030-09-30T12:30:00.00-04:00',
+        'ArchivedAt'=> nil, 'ExpectedPurgeDate' => nil,
+        'SubscriptionManagementConfiguration' => { 'UnsubscribeHandlingType' => 'None' } }
+    }
+
+    before do
+      allow(http_client).to receive(:post).with(api_endpoint) { api_response }
+    end
+
+    it 'calls the API endpoint' do
+      expect(http_client).to receive(:post).with(api_endpoint)
+      subject
+    end
+
+    it 'transforms the API response' do
+      expect(subject).to eq({ :id => stream_id, :server_id => server_id, :name => 'My Stream',
+                              :description => 'My test stream.', :message_stream_type => 'Transactional',
+                              :created_at => '2030-08-30T12:30:00.00-04:00',
+                              :updated_at => '2030-09-30T12:30:00.00-04:00',
+                              :archived_at => nil , :expected_purge_date => nil ,
+                              :subscription_management_configuration => { 'UnsubscribeHandlingType' => 'None' }})
+    end
   end
 
   describe '#create_suppressions' do
