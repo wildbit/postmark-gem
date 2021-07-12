@@ -161,6 +161,12 @@ describe(Postmark::InactiveRecipientError) do
       it {is_expected.to eq(recipients.take(1))}
     end
 
+    context 'i/n inactive, n > 1, i < n - new message format' do
+      let(:message) { "Message OK, but will not deliver to these inactive addresses: #{recipients[0...2].join(', ')}" }
+
+      it {is_expected.to eq(recipients.take(2))}
+    end
+
     context 'i/n inactive, n > 1, i < n' do
       let(:message) do
         'Message OK, but will not deliver to these inactive addresses: ' \

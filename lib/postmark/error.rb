@@ -72,8 +72,8 @@ module Postmark
     attr_reader :recipients
 
     PATTERNS = [/^Found inactive addresses: (.+?)\.$/.freeze,
-                /^Found inactive addresses: (.+?)\.$/.freeze,
-                /these inactive addresses: (.+?)\. Inactive/.freeze].freeze
+                /these inactive addresses: (.+?)\. Inactive/.freeze,
+                /these inactive addresses: (.+?)\.?$/].freeze
 
     def self.parse_recipients(message)
       PATTERNS.each do |p|
