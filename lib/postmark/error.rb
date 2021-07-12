@@ -30,9 +30,8 @@ module Postmark
     def initialize(status_code = 500, body = '', parsed_body = {})
       self.parsed_body = parsed_body
       self.status_code = status_code.to_i
-      message = parsed_body.fetch(
-        'Message',
-        "The Postmark API responded with HTTP status #{status_code}.")
+      self.body = body
+      message = parsed_body.fetch('Message', "The Postmark API responded with HTTP status #{status_code}.")
 
       super(message)
     end
@@ -44,6 +43,7 @@ module Postmark
 
   class ApiInputError < HttpServerError
     INACTIVE_RECIPIENT = 406
+    INVALID_EMAIL_ADDRESS = 300
 
     attr_accessor :error_code
 
@@ -52,7 +52,9 @@ module Postmark
 
       case error_code
       when INACTIVE_RECIPIENT
-        InactiveRecipientError.new(INACTIVE_RECIPIENT, body, parsed_body)
+        InactiveRecipientError.new(error_code, body, parsed_body)
+      when INVALID_EMAIL_ADDRESS
+        InvalidEmailAddressError.new(error_code, body, parsed_body)
       else
         new(error_code, body, parsed_body)
       end
@@ -67,6 +69,8 @@ module Postmark
       false
     end
   end
+
+  class InvalidEmailAddressError < ApiInputError; end
 
   class InactiveRecipientError < ApiInputError
     attr_reader :recipients

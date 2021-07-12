@@ -97,6 +97,13 @@ describe(Postmark::ApiInputError) do
         it_behaves_like 'api input error'
       end
 
+      context '300' do
+        let(:code) {Postmark::ApiInputError::INVALID_EMAIL_ADDRESS}
+
+        it {is_expected.to be_a(Postmark::InvalidEmailAddressError)}
+        it_behaves_like 'api input error'
+      end
+
       context 'others' do
         let(:code) {'9999'}
 
@@ -140,6 +147,33 @@ end
 
 describe(Postmark::MailAdapterError) do
   it {is_expected.to be_a(Postmark::Error)}
+end
+
+describe(Postmark::InvalidEmailAddressError) do
+  describe '.new' do
+    let(:response) {{'Message' => message}}
+
+    subject do
+      Postmark::InvalidEmailAddressError.new(
+        Postmark::ApiInputError::INVALID_EMAIL_ADDRESS, Postmark::Json.encode(response), response)
+    end
+
+    let(:message) do
+      "Error parsing 'To': Illegal email address 'johne.xample.com'. It must contain the '@' symbol."
+    end
+
+    it 'body is set' do
+      expect(subject.body).to eq(Postmark::Json.encode(response))
+    end
+
+    it 'parsed body is set' do
+      expect(subject.parsed_body).to eq(response)
+    end
+
+    it 'error code is set' do
+      expect(subject.error_code).to eq(Postmark::ApiInputError::INVALID_EMAIL_ADDRESS)
+    end
+  end
 end
 
 describe(Postmark::InactiveRecipientError) do
@@ -208,6 +242,18 @@ describe(Postmark::InactiveRecipientError) do
 
     it 'parses recipients from json payload' do
       expect(subject.recipients).to eq([address])
+    end
+
+    it 'body is set' do
+      expect(subject.body).to eq(Postmark::Json.encode(response))
+    end
+
+    it 'parsed body is set' do
+      expect(subject.parsed_body).to eq(response)
+    end
+
+    it 'error code is set' do
+      expect(subject.error_code).to eq(Postmark::ApiInputError::INACTIVE_RECIPIENT)
     end
   end
 end
