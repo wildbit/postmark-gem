@@ -60,14 +60,10 @@ module Postmark
       [e.full_response || {}, e]
     end
 
-    def format_response(response, compatible = false)
+    def format_response(response, compatible = false, options = {})
       return {} unless response
 
-      if response.kind_of? Array
-        response.map { |entry| Postmark::HashHelper.to_ruby(entry, compatible) }
-      else
-        Postmark::HashHelper.to_ruby(response, compatible)
-      end
+      Postmark::HashHelper.to_ruby(response, compatible, options)
     end
 
     def get_resource_count(path, options = {})

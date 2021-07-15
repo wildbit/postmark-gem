@@ -22,7 +22,7 @@ module Postmark
         message[:track_links] = ::Postmark::Inflector.to_postmark(message[:track_links])
       end
 
-      HashHelper.to_postmark(message)
+      HashHelper.to_postmark(message, :keys_to_skip => [:metadata])
     end
 
     def headers_to_postmark(headers)

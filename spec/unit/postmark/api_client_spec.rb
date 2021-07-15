@@ -793,7 +793,6 @@ describe Postmark::ApiClient do
         resp = subject.validate_template(:html_body => '{{MyName}}',
                                          :text_body => '{{MyName}}',
                                          :subject => '{{MyName}}')
-
         expect(resp[:all_content_is_valid]).to be true
         expect(resp[:html_body][:content_is_valid]).to be true
         expect(resp[:html_body][:validation_errors]).to be_empty
@@ -844,6 +843,7 @@ describe Postmark::ApiClient do
         expect(resp[:all_content_is_valid]).to be false
         expect(resp[:text_body][:content_is_valid]).to be true
         expect(resp[:html_body][:content_is_valid]).to be false
+        expect(resp[:html_body][:validation_errors].first[:line]).to eq(1)
         expect(resp[:html_body][:validation_errors].first[:character_position]).to eq(1)
         expect(resp[:html_body][:validation_errors].first[:message]).to eq('The \'each\' block being opened requires a model path to be specified in the form \'{#each <name>}\'.')
       end

@@ -253,22 +253,8 @@ module Postmark
 
     def validate_template(attributes = {})
       data = serialize(HashHelper.to_postmark(attributes))
-      response = format_response(http_client.post('templates/validate', data))
-
-      response.each do |k, v|
-        next unless v.is_a?(Hash) && k != :suggested_template_model
-
-        response[k] = HashHelper.to_ruby(v)
-
-        if response[k].has_key?(:validation_errors)
-          ruby_hashes = response[k][:validation_errors].map do |err|
-            HashHelper.to_ruby(err)
-          end
-          response[k][:validation_errors] = ruby_hashes
-        end
-      end
-
-      response
+      format_response(http_client.post('templates/validate', data), false,
+                      :keys_to_skip => ['SuggestedTemplateModel'])
     end
 
     def deliver_with_template(attributes = {})
